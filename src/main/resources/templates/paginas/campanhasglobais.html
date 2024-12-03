@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Titulo alterado-->
+    <title>Campanhas Globais</title>
+    <!--Corrigi o endereço dos arquivos-->
+    <link rel="stylesheet" th:href="@{/campanhasglobais.css}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link th:href="@{/img/logo.png}" rel="icon" type="image/x-icon">
+</head>
+<body>
+    <nav class="sidebar locked" th:classappend="${#authorization.expression('hasRole(''ROLE_MANAGER'')') ? 'manager' : ''}">
+        <div class="sidebar-controls">
+        <i class="bx bx-lock-alt" id="lock-icon" title="Desbloquear Sidebar"></i>
+        <i class='bx bx-menu' id="sidebar-close"></i>
+        <i class='bx bx-chevron-right' id="sidebar-closed-icon"></i>
+        </div>
+
+        <div class="logo_items flex">
+            <div class="user-info">
+            <!--Corrigi o endereço dos arquivos-->
+            <img th:src="@{/img/usu.png}" alt="Ícone usuário" id="user-icon">
+            <span class="logo_name" th:text="${message}"></span>
+            </div>
+
+           
+        </div>
+        <div class="menu_container">
+            <ul class="menu_item" th:classappend="${#authorization.expression('hasRole(''ROLE_MANAGER'')') ? 'manager' : ''}">
+                <!--Acrescentei 1 item selecionavel no menu'Gestao de filiais' e mudei 2 icones, e deixei os icones redirecionaveis-->
+                <li class="item"><a href="http://localhost:8080/"><span class="material-symbols-outlined">dashboard</span><span th:text="${#authorization.expression('hasRole(''ROLE_MANAGER'')') ? 'Dashboard Global' : 'Dashboard'}"></span></a></li>
+                <li class="item"><a href="http://localhost:8080/campanhas"><span class="material-symbols-outlined">campaign</span><span th:text="${#authorization.expression('hasRole(''ROLE_MANAGER'')') ? 'Gestão de Campanhas' : 'Campanhas'}"></span></a></li>
+                <li class="item" th:if="${#authorization.expression('hasRole(''ROLE_MANAGER'')')}"><a href="http://localhost:8080/usuarios"><span class="material-symbols-outlined">groups</span><span>Gestão de Usuários</span></a></li>
+                <li class="item" th:if="${#authorization.expression('hasRole(''ROLE_MANAGER'')')}"><a href="http://localhost:8080/filial"><span class="material-symbols-outlined">library_add</span><span>Gestão de Filiais</span></a></li>
+                <li class="item"><a href="http://localhost:8080/logout"><span class="material-symbols-outlined">logout</span><span>Logout</span></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main">
+       
+        <div class="upload-section">
+            <h1 class="title-upload" th:text="${#authorization.expression('hasRole(''ROLE_MANAGER'')') ? 'Campanhas Globais' : 'Campanhas'}"></h1>
+            <p class="last-upload">Lista de Campanhas: </p>
+
+        <button id="btnComidaPremiada" class="button_paginas" onclick="mostrarTabela('ComidaPremiada1')">Comida Premiada</button>
+        <button id="btnMelhoresEmpresas" class="button_paginas" onclick="mostrarTabela('MelhoresEmpresas1')">Melhores Empresas</button>
+        <button id="btnComeMelhor" class="button_paginas" onclick="mostrarTabela('ComeMelhor1')">Come Melhor</button>
+        <button id="btnDestaque" class="button_paginas" onclick="mostrarTabela('Destaque1')">Destaque</button>
+        <button id="btnDestaqueCorporativo" class="button_paginas" onclick="mostrarTabela('DestaqueCorporativo1')">Destaque Corporativo</button>
+        <a id="btnAtualizar" th:href="@{/update-sheets}" th:if="${#authorization.expression('hasRole(''ROLE_MANAGER'')')}">Atualizar</a>
+        
+            <table id="ComidaPremiada1" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Grupo</th>
+                        <th>Filial</th>
+                        <th>CNPJ</th>
+                        <th>Razão Social</th>
+                        <th>Categoria Participante</th>
+                        <th>Cargo Participante</th>
+                        <th>Nome Participante</th>
+                        <th>Meta</th>
+                        <th>Realizado</th>
+                        <th>Meta atingida?</th>
+                        <th>Valor Por Bateria</th>
+                        <th>Premiação</th>
+                        <th>Valor com taxa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="campanha : ${campanhas}">
+            		<td th:text="${campanha.periodo}"></td>
+            		<td th:text="${campanha.grupo}"></td>
+            		<td th:text="${campanha.empresa.nome}"></td> 
+            		<td th:text="${campanha.empresa.cnpj}"></td> 
+            		<td th:text="${campanha.empresa.razaosocial}"></td>
+            		<td th:text="${campanha.categoria_participante}"></td>
+            		<td th:text="${campanha.cargoParticipante}"></td>
+            		<td th:text="${campanha.nomeParticipante}"></td>
+            		<td th:text="${campanha.meta}"></td>
+            		<td th:text="${campanha.realizado}"></td>
+            		<td th:text="${campanha.meta_atingida}"></td>
+            		<td th:text="${campanha.valor_por_bateria}"></td>
+            		<td th:text="${campanha.valor_premiacao}"></td>
+            		<td th:text="${campanha.valor_com_taxa}"></td>
+                       
+                       
+                    </tr>
+
+
+                </tbody>
+            </table>
+            
+            <table id="MelhoresEmpresas1" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Grupo</th>
+                        <th>Filial</th>
+                        <th>CNPJ</th>
+                        <th>Razão Social</th>
+                        <th>Nome do Participante</th>
+                        <th>Meta</th>
+                        <th>Realizado</th>
+                        <th>Meta atingida?</th>
+                        <th>Positivou?</th>
+                        <th>Faixa de Premiação</th>
+                        <th>Premiação</th>
+                        <th>Valor com taxa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="campanha : ${campanhas1}">
+            		<td th:text="${campanha.periodo}"></td>
+            		<td th:text="${campanha.grupo}"></td>
+            		<td th:text="${campanha.empresa.nome}"></td> 
+            		<td th:text="${campanha.empresa.cnpj}"></td> 
+            		<td th:text="${campanha.empresa.razaosocial}"></td>
+            		<td th:text="${campanha.nomeParticipante}"></td>
+            		<td th:text="${campanha.meta}"></td>
+            		<td th:text="${campanha.realizado}"></td>
+            		<td th:text="${campanha.meta_atingida}"></td>
+            		<td th:text="${campanha.positivou}"></td>
+            		<td th:text="${campanha.faixa_de_premiacao}"></td>
+            		<td th:text="${campanha.valor_premiacao}"></td>
+            		<td th:text="${campanha.valor_com_taxa}"></td>
+                       
+                       
+                    </tr>
+
+
+                </tbody>
+            </table>
+            
+            <table id="ComeMelhor1" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Grupo</th>
+                        <th>Filial</th>
+                        <th>Cargo do Participante</th>
+                        <th>Nome do Participante</th>
+                        <th>Meta Volume</th>
+                        <th>Real Volume</th>
+                        <th>Meta Volume Atingida?</th>
+                        <th>Meta Positivação</th>
+                        <th>Real Positivação</th>
+                        <th>Meta Positivação atingida?</th>
+                        <th>Premiação</th>
+                        <th>Valor com taxa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="campanha : ${campanhas2}">
+            		<td th:text="${campanha.periodo}"></td>
+            		<td th:text="${campanha.grupo}"></td>
+            		<td th:text="${campanha.empresa.nome}"></td> 
+            		<td th:text="${campanha.cargoParticipante}"></td> 
+            		<td th:text="${campanha.nomeParticipante}"></td>
+            		<td th:text="${campanha.meta}"></td>
+            		<td th:text="${campanha.real_volume}"></td>
+            		<td th:text="${campanha.meta_atingida}"></td>
+            		<td th:text="${campanha.meta_positivacao}"></td>
+            		<td th:text="${campanha.real_positivacao}"></td>
+            		<td th:text="${campanha.meta_positivacao_atingida}"></td>
+            		<td th:text="${campanha.valor_premiacao}"></td>
+            		<td th:text="${campanha.valor_com_taxa}"></td>
+                       
+                       
+                    </tr>
+
+
+                </tbody>
+            </table>
+            
+            
+            <table id="Destaque1" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Grupo</th>
+                        <th>Filial</th>
+                        <th>Categoria do Participante</th>
+                        <th>Nome do Participante</th>
+                        <th>Premiação</th>
+                        <th>Valor com taxa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="campanha : ${campanhas3}">
+            		<td th:text="${campanha.periodo}"></td>
+            		<td th:text="${campanha.grupo}"></td>
+            		<td th:text="${campanha.empresa.nome}"></td>  
+            		<td th:text="${campanha.cargoParticipante}"></td>             		
+            		<td th:text="${campanha.nomeParticipante}"></td>
+            		<td th:text="${campanha.valor_premiacao}"></td>
+            		<td th:text="${campanha.valor_com_taxa}"></td>  
+                    </tr>
+                </tbody>
+            </table>
+            
+            <table id="DestaqueCorporativo1" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Grupo</th>
+                        <th>Filial</th>
+                        <th>Categoria do Participante</th>
+                        <th>Colocação</th>
+                        <th>Nome do Participante</th>
+                        <th>Premiação</th>
+                        <th>Valor com taxa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="campanha : ${campanhas4}">
+            		<td th:text="${campanha.periodo}"></td>
+            		<td th:text="${campanha.grupo}"></td>
+            		<td th:text="${campanha.empresa.nome}"></td>  
+            		<td th:text="${campanha.cargoParticipante}"></td>
+            		<td th:text="${campanha.colocacao}"></td>             		
+            		<td th:text="${campanha.nomeParticipante}"></td>
+            		<td th:text="${campanha.valor_premiacao}"></td>
+            		<td th:text="${campanha.valor_com_taxa}"></td>  
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!--Corrigi o endereço dos arquivos-->
+    <script th:src="@{/js/campanhasglobais.js}"></script>
+</body>
+</html>
