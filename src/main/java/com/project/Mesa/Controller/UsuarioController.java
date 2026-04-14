@@ -5,9 +5,9 @@ import com.project.Mesa.Repository.UserRepository;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,9 +19,14 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class UsuarioController {
 
-	@Autowired
-	private UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 	
+	private final UserRepository userRepository;
+	
+	public UsuarioController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
 
 	@RequestMapping("/usuarios")
 	public String user(Model model){
@@ -46,13 +51,19 @@ public class UsuarioController {
 	
 	
     @RequestMapping(method = RequestMethod.POST, value = "/salvarusuarios")
-    public String salvar(@ModelAttribute Users usuario) {
-        userRepository.save(usuario);
+    public String salvar(@ModelAttribute Users user) {
+    	Users UsersDTO = new Users();
+    	UsersDTO.setLogin(user.getLogin());
+    	UsersDTO.setPassword(passwordEncoder.encode(user.getPassword()));
+    	UsersDTO.setCargo(user.getCargo());
+    	UsersDTO.setEmpresa(user.getEmpresa());
+        
+        userRepository.save(UsersDTO);
         return "redirect:/usuarios";
     }
     
     @RequestMapping(method = RequestMethod.POST, value = "/editarusuarios")
-	 public ModelAndView editarFilial(@ModelAttribute Users user) {
+	 public ModelAndView editarUsuarios(@ModelAttribute Users user) {
 	     // Busca a filial pelo CNPJ
 	     Optional<Users> userExistente = userRepository.findById(user.getId());
 	     
@@ -60,7 +71,7 @@ public class UsuarioController {
 	         // Atualiza os dados da filial existente
 	         Users existente = userExistente.get();
 	         existente.setLogin(user.getLogin());
-	         existente.setPassword(user.getPassword());
+	         existente.setPassword(passwordEncoder.encode(user.getPassword()));
 	         existente.setCargo(user.getCargo());
 	         existente.setEmpresa(user.getEmpresa());
 	         

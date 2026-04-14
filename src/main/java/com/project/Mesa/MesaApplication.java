@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -13,7 +12,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -32,22 +31,29 @@ import com.project.Mesa.Service.SequenceService;
 @ComponentScan(basePackages = {"com.*"})
 @EnableJpaRepositories({"com.project.Mesa.Repository"})
 @EnableTransactionManagement 
-@EnableWebMvc
+
 @RestController
 @EnableAutoConfiguration
 public class MesaApplication {
 	
-	@Autowired
-	 private FilialRepository filialRepository;
+	 private final PasswordEncoder passwordEncoder;
 	 
-	 @Autowired
-	 private UserRepository usuario;
+	 private final FilialRepository filialRepository;
+ 
+	 private final UserRepository usuario;
 	 
-	 @Autowired
-	 private SequenceService sequenceService;
+	 private final SequenceService sequenceService;
 	 
-	@Autowired
-    private GoogleSheetsService googleSheetsService;
+	 private final GoogleSheetsService googleSheetsService;
+	
+	public MesaApplication(FilialRepository filialRepository, UserRepository usuario, 
+			SequenceService sequenceService,GoogleSheetsService googleSheetsService,PasswordEncoder passwordEncoder) {
+		this.filialRepository = filialRepository;
+		this.usuario = usuario;
+		this.sequenceService = sequenceService;
+		this.googleSheetsService = googleSheetsService;
+		this.passwordEncoder = passwordEncoder;
+	}
 	
 	public static void main(String[] args) {
 		SpringApplication.run(MesaApplication.class, args);
@@ -81,13 +87,13 @@ public class MesaApplication {
 	 private void criarUsuarioSeNaoExistir(UserRepository userRepository, String login, String cargo, String cnpjEmpresa, String senha) {
 		 Optional<filial> empresa = filialRepository.findById(cnpjEmpresa);  // Busca a filial pelo nome
 		    if (empresa.isPresent()) {  // Verifica se a filial existe
-		        Users user = userRepository.findByUsername(login);
-		        if (user == null) {
+		        Optional<Users> user = userRepository.findByUsername(login);
+		        if (user.isEmpty()) {
 		            Users novoUsuario = new Users();
 		            novoUsuario.setLogin(login);
 		            novoUsuario.setCargo(cargo);
 		            novoUsuario.setEmpresa(empresa.get());
-		            novoUsuario.setPassword(senha); 
+		            novoUsuario.setPassword(passwordEncoder.encode(senha)); 
 		            userRepository.save(novoUsuario);
 		            System.out.println("Usuário " + login + " criado com sucesso.");
 		        }
