@@ -1,41 +1,38 @@
-package com.project.Mesa.Security;
+package com.project.Mesa.Config;
 
-
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-
-
+import com.project.Mesa.Service.SecurityDatabaseService;
 
 @Configuration
-@EnableWebMvc
+@EnableWebSecurity
 public class WebSecurityConfig implements WebMvcConfigurer {
 
-	@Autowired
+	
 	private final SecurityDatabaseService securityDatabaseService;
 
 	public WebSecurityConfig(SecurityDatabaseService securityDatabaseService) {
 		this.securityDatabaseService = securityDatabaseService;
 	}
+	
+	@Bean
+	public DaoAuthenticationProvider authenticationProvider() {
+	    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 
-	@Autowired
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(securityDatabaseService).passwordEncoder(NoOpPasswordEncoder.getInstance());
+	    provider.setUserDetailsService(securityDatabaseService);
+	    provider.setPasswordEncoder(passwordEncoder());
+
+	    return provider;
 	}
 	
 	@Override
@@ -45,13 +42,14 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests((authz) -> authz
+		http
+			.authenticationProvider(authenticationProvider())
+			.authorizeHttpRequests((authz) -> authz
 				// Rotas acessíveis apenas pelo admin
 				.requestMatchers("/login.css","/img/**","/js/**").permitAll()
 				.requestMatchers("/salvarusuarios","/listarusuarios","/editarusuarios/{idusuario}",
 						"/filial","/upload","/usuarios","/update-sheets").hasRole("MANAGER")
-				
-				// Qualquer outra rota requer autenticação
+								// Qualquer outra rota requer autenticação
 				.anyRequest().authenticated())
 				// Usa o form da pagina tela.html do Spring Security
 				.formLogin((form) -> form
@@ -61,8 +59,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 						.permitAll())
 				 .logout(logout -> logout.logoutUrl("/logout")
 			             .permitAll());  
-		       
-		http.csrf().disable();
 
 		return http.build();
 	}
@@ -76,6 +72,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 	public UserDetailsService userDetailsService() {
 		return securityDatabaseService;
 	}
+	
 	/*
 	 * @Bean public InMemoryUserDetailsManager userDetailsService() {
 	 * 
