@@ -38,7 +38,7 @@ public class CampanhasController {
        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
        String username = auth.getName();
 
-       Users usua = userRepository.findByUsername(username);
+       Users usua = userRepository.findByUsername(username).get();
       
        
        if(username != null){

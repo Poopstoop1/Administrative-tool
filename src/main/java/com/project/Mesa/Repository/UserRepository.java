@@ -1,6 +1,8 @@
 package com.project.Mesa.Repository;
 
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -15,6 +17,6 @@ import jakarta.transaction.Transactional;
 public interface UserRepository extends CrudRepository<Users, Long>{
 
 	@Query("select u from Users u where u.login = ?1 ")
-	public Users findByUsername(String login);
+	Optional<Users> findByUsername(String login);
 
 }

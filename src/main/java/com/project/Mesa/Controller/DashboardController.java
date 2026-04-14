@@ -27,7 +27,7 @@ public class DashboardController {
     public String index(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        Users usua = userRepository.findByUsername(username);
+        Users usua = userRepository.findByUsername(username).get();
     
         // Passar o nome formatado do usuário
         if (username != null) {
