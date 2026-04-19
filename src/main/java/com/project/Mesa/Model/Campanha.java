@@ -56,7 +56,7 @@ public class Campanha implements Serializable {
 
 	private String positivou;
 	
-	private String paginas;
+	private String pagina;
 
 	
 
