@@ -1,5 +1,7 @@
 package com.project.Mesa.Controller.dto.usuario;
 
-public record UsuarioRequestDTO(String nome, String Login, String Cargo) {
+import com.project.Mesa.Model.Filial;
+
+public record UsuarioRequestDTO(String nome, String Login, String password, String Cargo, Filial filial) {
 
 }
