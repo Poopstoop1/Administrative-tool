@@ -19,9 +19,6 @@ public class CampanhaExistenteValidator{
 		Boolean campanhaExistente = campanhaRepository
 				.existsByPeriodoAndGrupoAndCargoParticipanteAndNomeParticipanteAndEmpresaAndPagina(dto.getPeriodo(), 
 						dto.getGrupo(), dto.getCargoParticipante(), dto.getNomeParticipante(), dto.getEmpresa(), dto.getPagina());
-		if(campanhaExistente){
-			throw new ValidationException("Campanha já existe");
-		}
 		
 		return campanhaExistente;
 		

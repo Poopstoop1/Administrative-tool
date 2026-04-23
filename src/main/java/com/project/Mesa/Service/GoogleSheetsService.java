@@ -44,7 +44,7 @@ public class GoogleSheetsService {
 
 			for (int i = 1; i < values.size(); i++) {
 				Campanha campanha = campanhaSheetMapper.toCampanha(values.get(i), sheetName);
-
+				
 				campanhaValidator.validaCamposdeCampanha(campanha);
 				if (campanha.getEmpresa() != null && !campanhaExistenteValidator.buscarCampanhaExistente(campanha)) {
 					campanhasNovas.add(campanhaRepository.save(campanha));
