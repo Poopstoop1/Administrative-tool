@@ -1,94 +1,57 @@
 package com.project.Mesa.Controller;
 
-import com.project.Mesa.Model.Users;
-import com.project.Mesa.Repository.UserRepository;
-
-import java.util.Optional;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import com.project.Mesa.Controller.dto.usuario.UsuarioRequestDTO;
+import com.project.Mesa.Controller.dto.usuario.UsuarioResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-@Controller
-public class UsuarioController {
+@Tag(name = "Usuario Controller", description = "Crud de Usuario")
+public interface UsuarioController {
 
-	private final PasswordEncoder passwordEncoder;
-	
-	private final UserRepository userRepository;
-	
-	public UsuarioController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-		this.userRepository = userRepository;
-		this.passwordEncoder = passwordEncoder;
-	}
+	@Operation(summary = "Criar Usuario", description = "Cria um úsuario no banco")
+	@ApiResponses({
+			@ApiResponse(responseCode = "201", description = "Usuario criado com sucesso", 
+					content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Erro ao tentar criar usuario", content = @Content) })
+	@PostMapping
+	public ResponseEntity<UsuarioResponseDTO> criarUsuario(@RequestBody UsuarioRequestDTO usuarioRequestDTO);
 
-	@RequestMapping("/usuarios")
-	public String user(Model model){
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String username = auth.getName();
-
-
-		if(username != null){
-			String nomeFormatado = formatarNome(username);
-			model.addAttribute("message", nomeFormatado);
-		}
-		 model.addAttribute("usuarios", userRepository.findAll());
-		model.addAttribute("usuarioobj", new Users());
-		return "/paginas/gestaodeusuarios";
-	}
-
-	private String formatarNome(String username) {
-		// Divide o nome em letras maiúsculas e minúsculas
-		// Exemplo: "ErysonMoreira" -> "Eryson Moreira"
-		return username.replaceAll("([a-z])([A-Z])", "$1 $2");
-	}
+	@Operation(summary = "Listar Usuario", description = "Buscar todos os úsuarios")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Lista de Usuario retornada", 
+				content = @Content(array = @ArraySchema(schema = @Schema(implementation = UsuarioResponseDTO.class)))),
+	})
+	@GetMapping
+	public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios();
 	
 	
-    @RequestMapping(method = RequestMethod.POST, value = "/salvarusuarios")
-    public String salvar(@ModelAttribute Users user) {
-    	Users UsersDTO = new Users();
-    	UsersDTO.setLogin(user.getLogin());
-    	UsersDTO.setPassword(passwordEncoder.encode(user.getPassword()));
-    	UsersDTO.setCargo(user.getCargo());
-    	UsersDTO.setEmpresa(user.getEmpresa());
-        
-        userRepository.save(UsersDTO);
-        return "redirect:/usuarios";
-    }
-    
-    @RequestMapping(method = RequestMethod.POST, value = "/editarusuarios")
-	 public ModelAndView editarUsuarios(@ModelAttribute Users user) {
-	     // Busca a filial pelo CNPJ
-	     Optional<Users> userExistente = userRepository.findById(user.getId());
-	     
-	     if (userExistente.isPresent()) {
-	         // Atualiza os dados da filial existente
-	         Users existente = userExistente.get();
-	         existente.setLogin(user.getLogin());
-	         existente.setPassword(passwordEncoder.encode(user.getPassword()));
-	         existente.setCargo(user.getCargo());
-	         existente.setEmpresa(user.getEmpresa());
-	         
-	         // Salva as alterações no banco
-	         userRepository.save(existente);
-	     } else {
-	         System.out.println("User não encontrado: " + user.getId());
-	     }
-	     
-	     // Redireciona para a página de gestão de filiais
-	     return new ModelAndView("redirect:/usuarios");
-	 }
+	@Operation(summary = "RemoverUsuario", description = "Deletar Usuario por ID")
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "Lista de Usuario retornada", content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))),
+		@ApiResponse(responseCode = "404", description = "Usuario id não encontrado")
+	})
+	@DeleteMapping(path = "/{id}")
+	public ResponseEntity<Void> removerUsuario(@PathVariable Long id);
 
-    @RequestMapping(method = RequestMethod.GET, value = "/removerusuario/{idusuario}")
-    public String excluir(@PathVariable("idusuario") Long idusuario) {
-        userRepository.deleteById(idusuario);
-        return "redirect:/usuarios";
-    }
-    
+	@Operation(summary = "EditarUsuario", description = "Atualiza Usuario no banco por ID")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Lista de Usuario retornada", content = @Content(schema = @Schema(implementation = UsuarioResponseDTO.class))),
+		@ApiResponse(responseCode = "404", description = "Usuario id não encontrado")
+	})
+	@PutMapping(path = "/{id}")
+	public ResponseEntity<UsuarioResponseDTO> editarUsuario(@PathVariable Long id,
+			@RequestBody UsuarioRequestDTO usuarioRequestDTO);
 }

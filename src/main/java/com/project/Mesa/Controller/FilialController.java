@@ -1,83 +1,56 @@
 package com.project.Mesa.Controller;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
-import com.project.Mesa.Model.filial;
-import com.project.Mesa.Repository.FilialRepository;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import com.project.Mesa.Controller.dto.filial.FilialRequestDTO;
+import com.project.Mesa.Controller.dto.filial.FilialResponseDTO;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Controller
-public class FilialController {
+@Tag(name = "Filial Controller", description = "Crud de Filial Controller")
+public interface FilialController {
+
+	@Operation(summary = "Criar Filial", description = "Criação de Filial no Banco de dados")
+	@ApiResponses({
+		@ApiResponse(responseCode = "201", description = "Filial criada com sucesso", content = @Content(schema = @Schema(implementation = FilialResponseDTO.class))),
+		@ApiResponse(responseCode = "400", description = "Error ao tentar criar filial", content = @Content)
+	})
+	@PostMapping
+	public ResponseEntity<FilialResponseDTO> criarFilial(@RequestBody FilialRequestDTO filialRequestDTO);
 	
-	@Autowired
-	private FilialRepository filialrepository;
+	@Operation(summary = "BuscarFiliais", description = "Listar Filiais")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Lista de Filiais retornada", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FilialResponseDTO.class))))
+	})
+	@GetMapping
+	public ResponseEntity<List<FilialResponseDTO>> BuscarFiliais();
 	
-	@RequestMapping("/filial")
-	public String filial(Model model) {	
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String username = auth.getName();
-
-
-		if(username != null){
-			String nomeFormatado = formatarNome(username);
-			model.addAttribute("message", nomeFormatado);
-		}
-		model.addAttribute("filialobj", new filial());
-		Iterable<filial> filiais = filialrepository.findAll();
-        model.addAttribute("filiais", filiais);
-		return "/paginas/gestaodefiliais";
-	}
+	@Operation(summary = "Editar Filial", description = "Editar Filial no Banco de dados")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Filial editada com sucesso", content = @Content(schema = @Schema(implementation = FilialResponseDTO.class))),
+		@ApiResponse(responseCode = "404", description = "Error Filial não encontrado", content = @Content)
+	})
+	@PutMapping(path = "/{cnpj}")
+	public ResponseEntity<FilialResponseDTO> Editarfilial(@Parameter(description = "CNPJ de Filial", required = true, schema = @Schema(type = "string"))@PathVariable String cnpj, @RequestBody FilialRequestDTO filialRequestDTO);
 	
-	private String formatarNome(String username) {
-		// Divide o nome em letras maiúsculas e minúsculas
-		// Exemplo: "ErysonMoreira" -> "Eryson Moreira"
-		return username.replaceAll("([a-z])([A-Z])", "$1 $2");
-	}
-	
-	
-	 @RequestMapping(method = RequestMethod.POST, value = "/salvarfiliais")
-	    public ModelAndView salvar(@ModelAttribute filial filiais) {
-	        ModelAndView modelview = new ModelAndView("redirect:/filial");
-	        filialrepository.save(filiais);
-	        return modelview;
-	    }
-
-	 @RequestMapping(method = RequestMethod.POST, value = "/editarfilial")
-	 public ModelAndView editarFilial(@ModelAttribute filial filial) {
-	     // Busca a filial pelo CNPJ
-	     Optional<filial> filialExistente = filialrepository.findById(filial.getCnpj());
-	     
-	     if (filialExistente.isPresent()) {
-	         // Atualiza os dados da filial existente
-	         filial existente = filialExistente.get();
-	         existente.setNome(filial.getNome());
-	         existente.setRazaosocial(filial.getRazaosocial());
-	         
-	         // Salva as alterações no banco
-	         filialrepository.save(existente);
-	     } else {
-	         System.out.println("Filial não encontrada com o CNPJ: " + filial.getCnpj());
-	     }
-	     
-	     // Redireciona para a página de gestão de filiais
-	     return new ModelAndView("redirect:/filial");
-	 }
-
-	    @RequestMapping(method = RequestMethod.GET, value = "/removerfilial/{cnpjfilial}")
-	    public ModelAndView excluir(@PathVariable("cnpjfilial") String cnpj) {
-	        filialrepository.deleteById(cnpj);
-	        return new ModelAndView("redirect:/filial");
-	    }
-	
-
+	@Operation(summary = "RemoverFilial", description = "Remove Filial do Banco de dados")
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "Filial removida com sucesso", content = @Content(schema = @Schema(implementation = FilialResponseDTO.class))),
+		@ApiResponse(responseCode = "404", description = "Error Filial não encontrada", content = @Content)
+	})
+	@DeleteMapping(path = "/{cnpj}")
+	public ResponseEntity<Void> RemoverFilial(@Parameter(description = "CNPJ de Filial", required = true, schema = @Schema(type = "string"))@PathVariable String cnpj);
 }
