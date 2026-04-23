@@ -46,9 +46,7 @@ public class Usuario implements UserDetails {
 	    return Collections.singletonList(new SimpleGrantedAuthority(role));
 	}
 	
-	public String getCnpjEmpresa() {
-	    return empresa != null ? empresa.getCnpj() : null;
-	}
+
 	
 	@Override
 	public String getUsername() {

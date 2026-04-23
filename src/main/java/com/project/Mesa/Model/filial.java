@@ -27,7 +27,7 @@ public class Filial implements Serializable{
 	@Column(unique = true)
 	private String cnpj;
 	private String nome;
-	private String razaosocial;
+	private String razaoSocial;
 	
 	@OneToMany(mappedBy = "empresa",orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<Usuario> usuarios = new ArrayList<Usuario>();
