@@ -1,7 +1,6 @@
 package com.project.Mesa.Mapper.impl;
 
 import org.springframework.stereotype.Component;
-
 import com.project.Mesa.Controller.dto.usuario.UsuarioRequestDTO;
 import com.project.Mesa.Controller.dto.usuario.UsuarioResponseDTO;
 import com.project.Mesa.Mapper.UsuarioMapper;
@@ -14,9 +13,8 @@ public class UsuarioMapperImpl implements UsuarioMapper {
 	public Usuario toUsuario(UsuarioRequestDTO usuarioRequestDTO) {
 		Usuario usuario = new Usuario();
 		usuario.setNome(usuarioRequestDTO.nome());
-		usuario.setLogin(usuarioRequestDTO.Login());
-		usuario.setPassword(usuarioRequestDTO.password());
-		usuario.setEmpresa(usuarioRequestDTO.filial());
+		usuario.setLogin(usuarioRequestDTO.login());
+		usuario.setCargo(usuarioRequestDTO.cargo());
 		return usuario;
 	}
 
@@ -29,16 +27,12 @@ public class UsuarioMapperImpl implements UsuarioMapper {
 	public void atualizaCampos(Usuario usuario, UsuarioRequestDTO dtoEditado) {
 		if (dtoEditado.nome() != null && !dtoEditado.nome().isBlank())
 			usuario.setNome(dtoEditado.nome());
-		
-		if (dtoEditado.Login() != null && !dtoEditado.Login().isBlank())
-			usuario.setLogin(dtoEditado.Login());
-		
+
+		if (dtoEditado.login() != null && !dtoEditado.login().isBlank())
+			usuario.setLogin(dtoEditado.login());
+
 		if (dtoEditado.password() != null && !dtoEditado.password().isBlank())
 			usuario.setPassword(dtoEditado.password());
-		
-		if (dtoEditado.filial() != null)
-			usuario.setEmpresa(dtoEditado.filial());
-
 	}
 
 }

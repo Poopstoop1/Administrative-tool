@@ -15,7 +15,7 @@ public class FilialMapperImpl implements FilialMapper {
 		Filial filial = new Filial();
 		filial.setCnpj(filialRequestDTO.cnpj().replaceAll("\\D", ""));
 		filial.setNome(filialRequestDTO.nome());
-		filial.setRazaosocial(filialRequestDTO.razaosocial());
+		filial.setRazaoSocial(filialRequestDTO.razaosocial());
 		return filial;
 	}
 
@@ -26,12 +26,12 @@ public class FilialMapperImpl implements FilialMapper {
 
 	@Override
 	public void atualizarCampos(Filial filial, FilialRequestDTO filialRequestDTO) {
-		if (filialRequestDTO.cnpj() != null && filialRequestDTO.cnpj().isBlank())
-			filial.setCnpj(filialRequestDTO.cnpj().replaceAll("\\D", " "));
-		if (filialRequestDTO.nome() != null && filialRequestDTO.nome().isBlank())
+		if (filialRequestDTO.cnpj() != null && !filialRequestDTO.cnpj().isBlank())
+			filial.setCnpj(filialRequestDTO.cnpj().replaceAll("\\D", ""));
+		if (filialRequestDTO.nome() != null && !filialRequestDTO.nome().isBlank())
 			filial.setNome(filialRequestDTO.nome());
 		if (filialRequestDTO.razaosocial() != null && filialRequestDTO.razaosocial().isBlank())
-			filial.setRazaosocial(filialRequestDTO.razaosocial());
+			filial.setRazaoSocial(filialRequestDTO.razaosocial());
 	}
 
 }

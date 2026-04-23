@@ -1,8 +1,9 @@
 package com.project.Mesa.Mapper.impl;
 
 import org.springframework.stereotype.Component;
+
+import com.project.Mesa.Controller.dto.campanha.CampanhaRequestDTO;
 import com.project.Mesa.Controller.dto.campanha.CampanhaResponseDTO;
-import com.project.Mesa.Controller.dto.campanha.CampanhaSheetDTO;
 import com.project.Mesa.Mapper.CampanhaMapper;
 import com.project.Mesa.Model.Campanha;
 
@@ -10,11 +11,10 @@ import com.project.Mesa.Model.Campanha;
 public class CampanhaMapperImpl implements CampanhaMapper {
 
 	@Override
-	public Campanha toCampanha(CampanhaSheetDTO campanhaSheetDTO) {
+	public Campanha toCampanha(CampanhaRequestDTO campanhaSheetDTO) {
 		Campanha campanha = new Campanha();
 		campanha.setPeriodo(campanhaSheetDTO.periodo());
 		campanha.setGrupo(campanhaSheetDTO.grupo());
-		campanha.setEmpresa(campanhaSheetDTO.empresa());
 		campanha.setCategoria_participante(campanhaSheetDTO.categoria_participante());
 		campanha.setCargoParticipante(campanhaSheetDTO.cargoParticipante());
 		campanha.setNomeParticipante(campanhaSheetDTO.nomeParticipante());
@@ -27,7 +27,6 @@ public class CampanhaMapperImpl implements CampanhaMapper {
 		campanha.setColocacao(campanhaSheetDTO.colocacao());
 		campanha.setPositivou(campanhaSheetDTO.positivou());
 		campanha.setPagina(campanhaSheetDTO.pagina());
-
 		return campanha;
 	}
 
