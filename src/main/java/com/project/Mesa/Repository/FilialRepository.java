@@ -3,16 +3,18 @@ package com.project.Mesa.Repository;
 
 import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.stereotype.Repository;
 
-import com.project.Mesa.Model.filial;
+import com.project.Mesa.Model.Filial;
 
-import jakarta.transaction.Transactional;
 
 @Repository
-@Transactional
-public interface FilialRepository extends CrudRepository<filial, String>{
-	Optional<filial> findByNome(String nome);
+public interface FilialRepository extends JpaRepository<Filial, String>{
+	Optional<Filial> findByNome(String nome);
+	
+	Boolean existsByNome(String nome);
+	
+	Boolean existsByRazaoSocial(String razaoSocial);
 }
