@@ -3,7 +3,6 @@ package com.project.Mesa.Validation.validators.campanha;
 import org.springframework.stereotype.Component;
 import com.project.Mesa.Model.Campanha;
 import com.project.Mesa.Repository.CampanhaRepository;
-import com.project.Mesa.Service.exception.ValidationException;
 
 @Component
 public class CampanhaExistenteValidator{
