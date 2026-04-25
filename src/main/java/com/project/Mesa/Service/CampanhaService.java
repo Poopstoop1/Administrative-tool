@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.project.Mesa.Controller.dto.campanha.CampanhaResponseDTO;
 import com.project.Mesa.Mapper.impl.CampanhaMapperImpl;
+import com.project.Mesa.Model.Campanha;
 import com.project.Mesa.Model.Usuario;
 import com.project.Mesa.Repository.CampanhaRepository;
 import com.project.Mesa.Repository.UsuarioRepository;
@@ -42,6 +43,14 @@ public class CampanhaService {
 		return campanhaRepository.findByPaginaAndEmpresaCnpj(pagina, usuario.getEmpresa().getCnpj()).stream()
 				.map(campanhaMapper::campanhaResponseDTO).toList();
 
+	}
+	
+	@Transactional
+	public void removerCampanha(Long id) {
+		Campanha campanhaListada = campanhaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Campanha não encontrada!"));
+				
+			campanhaRepository.delete(campanhaListada);
+		
 	}
 
 }

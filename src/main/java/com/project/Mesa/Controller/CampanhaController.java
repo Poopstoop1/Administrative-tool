@@ -2,6 +2,7 @@ package com.project.Mesa.Controller;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +10,7 @@ import com.project.Mesa.Controller.dto.campanha.CampanhaResponseDTO;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,11 +30,18 @@ public interface CampanhaController {
 
 	@Operation(summary = "importaCampanha", description = "Importa dados de campanhas da Planilha Online")
 	@ApiResponses({
-			@ApiResponse(responseCode = "201", description = "Campanhas importadas com sucesso.",
-					content = @Content(schema = @Schema(implementation = CampanhaResponseDTO.class))),
+			@ApiResponse(responseCode = "201", description = "Campanhas importadas com sucesso",
+					content = @Content(array = @ArraySchema(schema = @Schema(implementation = CampanhaResponseDTO.class)))),
 			@ApiResponse(responseCode = "500", description = "Erro ao importar dados do Google Sheets", content = @Content) })
 	@PostMapping(path = "/importarCampanha")
 	public ResponseEntity<List<CampanhaResponseDTO>> importarCampanhasGoogleSheet();
 	
-
+	@Operation(summary = "removerCampanha", description = "Remover campanha do banco por ID")
+	@ApiResponses({
+			@ApiResponse(responseCode = "204", description = "Campanha removida com sucesso",
+					content = @Content(schema = @Schema(implementation = CampanhaResponseDTO.class))),
+			@ApiResponse(responseCode = "404", description = "Campanha não encontrada", content = @Content) })
+	@DeleteMapping(path = "/{id}")
+	public ResponseEntity<Void> removerCampanha(@Parameter(description = "ID do usuário", required = true, example = "1",
+            schema = @Schema(type = "integer", format = "int64"))Long id);
 }
