@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(ValidationException.class)
-	public ResponseEntity<ApiError> usuarioValidation(ValidationException ex, WebRequest request) {
+	public ResponseEntity<ApiError> Validation(ValidationException ex, WebRequest request) {
 		ApiError error = new ApiError("Validation Field Exception", ex.getMessage(), HttpStatus.BAD_REQUEST.value(),
 				request.getDescription(false).replace("uri=", ""), LocalDateTime.now());
 
@@ -31,11 +31,24 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity<ApiError> dataIntegratyViolation(DataIntegrityViolationException ex, WebRequest request) {
+	public ResponseEntity<ApiError> dataIntegrityViolation(DataIntegrityViolationException ex, WebRequest request) {
 		ApiError error = new ApiError("Validation Field Exception", "Operação não permitida: já há dados iguais cadastrado.", HttpStatus.BAD_REQUEST.value(),
 				request.getDescription(false).replace("uri=", ""), LocalDateTime.now());
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ApiError> handleGeneric(Exception ex, WebRequest request) {
+	    ApiError error = new ApiError(
+	            "Internal Server Error",
+	            "Erro interno do servidor",
+	            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+	            request.getDescription(false).replace("uri=", ""),
+	            LocalDateTime.now()
+	    );
+
+	    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	}
 
 }
