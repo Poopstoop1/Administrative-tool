@@ -1,10 +1,12 @@
-package com.Mesa.Mesa;
+package com.project.Mesa.Service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +34,7 @@ import com.project.Mesa.Model.Filial;
 import com.project.Mesa.Model.Usuario;
 import com.project.Mesa.Repository.CampanhaRepository;
 import com.project.Mesa.Repository.UsuarioRepository;
-import com.project.Mesa.Service.CampanhaService;
+import com.project.Mesa.Service.exception.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class CampanhaServiceTest {
@@ -52,7 +54,6 @@ public class CampanhaServiceTest {
         SecurityContextHolder.clearContext();
     }
 
-    // 🔥 TESTE 1 — MANAGER
     @Test
     @DisplayName("Deve retornar campanhas da página quando usuário for manager")
     void deveRetornarCampanhas_quandoUsuarioForManager() {
@@ -180,6 +181,54 @@ public class CampanhaServiceTest {
         verify(campanhaRepository)
                 .findByPaginaAndEmpresaCnpj(PAGINA, "999");
     }
+    
+    @Test
+    @DisplayName("Deve lançar exceção quando usuário não for encontrado")
+    void deveLancarException_quandoUsuarioNaoEncontrado() {
 
+        Authentication auth = mock(Authentication.class);
+        SecurityContext context = mock(SecurityContext.class);
+
+        when(context.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(context);
+
+        when(auth.getName()).thenReturn("inexistente");
+
+        when(usuarioRepository.findByUsername("inexistente"))
+                .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            campanhaService.ListarCampanhaPorPagina(PAGINA);
+        });
+    }
+
+    
+    @Test
+    @DisplayName("Deve remover campanha com sucesso")
+    void deveRemoverCampanha() {
+
+        Campanha campanha = new Campanha();
+
+        when(campanhaRepository.findById(1L))
+            .thenReturn(Optional.of(campanha));
+
+        campanhaService.removerCampanha(1L);
+
+        verify(campanhaRepository).delete(campanha);
+    }
+    
+    @Test
+    @DisplayName("Deve lançar exceção ao remover campanha inexistente")
+    void deveLancarException_quandoRemoverCampanhaInexistente() {
+
+        when(campanhaRepository.findById(1L))
+            .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            campanhaService.removerCampanha(1L);
+        });
+
+        verify(campanhaRepository, never()).delete(any());
+    }
 	
 }

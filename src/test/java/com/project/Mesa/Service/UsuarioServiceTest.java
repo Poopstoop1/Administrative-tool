@@ -1,4 +1,4 @@
-package com.Mesa.Mesa;
+package com.project.Mesa.Service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,7 +31,6 @@ import com.project.Mesa.Model.Filial;
 import com.project.Mesa.Model.Usuario;
 import com.project.Mesa.Repository.FilialRepository;
 import com.project.Mesa.Repository.UsuarioRepository;
-import com.project.Mesa.Service.UsuarioService;
 import com.project.Mesa.Service.exception.ResourceNotFoundException;
 import com.project.Mesa.Validation.validators.CNPJValidator;
 import com.project.Mesa.Validation.validators.usuario.UsuarioValidator;
@@ -134,11 +133,19 @@ public class UsuarioServiceTest {
     }
     
     @Test
-    @DisplayName("Deve Lançarr exceção se filial não existir")
+    @DisplayName("Deve lançar exceção se filial não existir")
     void deveLancarException_quandoFilialNaoExiste() {
 
-        doThrow(new ResourceNotFoundException("Filial não encontrada"))
-            .when(usuarioValidator).validaCamposdoUsuario(request);
+        doNothing().when(usuarioValidator).validaCamposdoUsuario(request);
+
+        when(cnpjValidator.validarCNPJ(anyString()))
+            .thenReturn("cnpj");
+
+        when(usuarioMapper.toUsuario(request))
+            .thenReturn(usuarioSalvo);
+
+        when(filialRepository.findById(any()))
+            .thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> {
             usuarioService.adicionarUsuario(request);
@@ -183,6 +190,36 @@ public class UsuarioServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> {
             usuarioService.atualizarUsuario(id, request);
         });
+    }
+    
+    @Test
+    @DisplayName("Deve deletar usuário com sucesso")
+    void deveDeletarUsuario_quandoUsuarioExiste() {
+
+        when(usuarioRepository.findById(id))
+            .thenReturn(Optional.of(usuarioSalvo));
+
+        doNothing().when(usuarioRepository).delete(usuarioSalvo);
+
+        usuarioService.deletarUsuario(id);
+
+        verify(usuarioRepository).findById(id);
+        verify(usuarioRepository).delete(usuarioSalvo);
+    }
+    
+    @Test
+    @DisplayName("Deve lançar exceção ao deletar usuário inexistente")
+    void deveLancarException_quandoDeletarUsuarioInexistente() {
+
+        when(usuarioRepository.findById(id))
+            .thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            usuarioService.deletarUsuario(id);
+        });
+
+        verify(usuarioRepository).findById(id);
+        verify(usuarioRepository, never()).delete(any());
     }
     
 }
