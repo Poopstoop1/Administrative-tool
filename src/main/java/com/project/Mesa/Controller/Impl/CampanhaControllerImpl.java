@@ -31,7 +31,7 @@ public class CampanhaControllerImpl implements CampanhaController {
 	private final GoogleSheetsService googleSheetService;
 	
 	@GetMapping(path = "/{pagina}")
-	public ResponseEntity<List<CampanhaResponseDTO>> getFindCampanhaByPagina(@PathVariable String pagina) {
+	public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhaPorPagina(@PathVariable String pagina) {
 		return ResponseEntity.status(HttpStatus.OK).body(this.campanhaService.ListarCampanhaPorPagina(pagina));
 	}
 	
@@ -45,7 +45,7 @@ public class CampanhaControllerImpl implements CampanhaController {
 	}
 
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<Void> removerCampanha(Long id) {
+	public ResponseEntity<Void> removerCampanha(@PathVariable Long id) {
 		campanhaService.removerCampanha(id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}

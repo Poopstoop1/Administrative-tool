@@ -20,13 +20,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Campanha Controller", description = "Funções para Campanha")
 public interface CampanhaController {
 
-	@Operation(summary = "FindCampanhaByPagina", description = "Busca a lista de Campanha por Pagina")
+	@Operation(summary = "listarCampanhaPorPagina", description = "Busca a lista de Campanha por Pagina")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Campanha encontrada con sucesso"),
 		@ApiResponse(responseCode = "404", description = "Campanha não encontrada")
 	})
 	@GetMapping(path = "/{pagina}")
-	public ResponseEntity<List<CampanhaResponseDTO>> getFindCampanhaByPagina(@Parameter(description = "Pagina de Campanha", required = true, schema = @Schema(type = "string"))@PathVariable String pagina);
+	public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhaPorPagina(@Parameter(description = "Pagina de Campanha", required = true, schema = @Schema(type = "string"))@PathVariable String pagina);
 
 	@Operation(summary = "importaCampanha", description = "Importa dados de campanhas da Planilha Online")
 	@ApiResponses({
