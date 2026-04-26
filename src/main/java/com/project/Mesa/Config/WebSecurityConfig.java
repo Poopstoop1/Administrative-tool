@@ -2,7 +2,6 @@ package com.project.Mesa.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,6 +23,17 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
 	private final SecurityFilter securityFilter;
 
+	private static final String[] MANAGER_ENDPOINTS = {
+			"/usuario/**", "/filial/**", "/campanha/importarCampanha"
+	};
+	
+	private static final String[] PUBLIC_ENDPOINTS = {
+			"/v3/api-docs/**",
+			"/swagger-ui/**",
+			"/swagger-ui.html",
+			"/login/**"
+	};
+	
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
@@ -34,13 +44,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 		http.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests((authz) -> authz
-						.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-						.requestMatchers("/login/**").permitAll()
-						.requestMatchers(
-								"/v3/api-docs/**",
-								"/swagger-ui/**",
-								"/swagger-ui.html"
-								).permitAll()
+						.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+						.requestMatchers(MANAGER_ENDPOINTS).hasRole("MANAGER")
 						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 
